@@ -34,11 +34,11 @@ struct TExample {
         : Id(id), Approx(approx), Target(target), Size(size) {
     }
 
-    static bool Greater(const TExample& a, const TExample& b) {
+    static bool LessByApprox(const TExample& a, const TExample& b) {
         return a.Approx != b.Approx ? a.Approx < b.Approx : a.Size > b.Size;
     }
 
-    static bool IdealGreater(const TExample& a, const TExample& b) {
+    static bool LessByTarget(const TExample& a, const TExample& b) {
         return a.Target * b.Size < b.Target * a.Size;
     }
 };
@@ -103,13 +103,13 @@ public:
     }
 
     float CalcQueryError(TVector<TExample>& sample) const {
-        Sort(sample.begin(), sample.end(), TExample::Greater);
-        auto auc = GetAuc(sample);
+        Sort(sample.begin(), sample.end(), TExample::LessByApprox);
+        auto approxAuc = GetAuc(sample);
 
-        Sort(sample.begin(), sample.end(), TExample::IdealGreater);
-        auto idealAuc = GetAuc(sample);
+        Sort(sample.begin(), sample.end(), TExample::LessByTarget);
+        auto targetAuc = GetAuc(sample);
 
-        return auc / idealAuc;
+        return approxAuc / targetAuc;
     }
 
     void CalcDersForQueries(
@@ -149,7 +149,7 @@ public:
 
         auto sample = GetSample(approx, target, weight, offset, querySize);
 
-        Sort(sample.begin(), sample.end(), TExample::Greater);
+        Sort(sample.begin(), sample.end(), TExample::LessByApprox);
         Sum(sample);
 
         for (ui32 iter = 0; iter < ItersCount; ++iter) {
