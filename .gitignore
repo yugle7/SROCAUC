@@ -34,3 +34,6 @@
 CMakeLists.txt
 main.cpp
 types.h
+
+.idea
+cmake-build-debug
